@@ -6,27 +6,37 @@ Sudoku::Sudoku()
     {
         for (int j = 0; j < 9; j++)
         {
-            mCells[i][j] = new Cell{0};
+            mCells[i][j] = new Cell{0, 0, 0};
         }
     }
 }
-Sudoku::Sudoku(int * iBoxes[9][9]) 
+Sudoku::Sudoku(int * iCells[9][9]) 
 {
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            mCells[i][j] = new Cell{iBoxes[i][j]};
+            mCells[i][j] = new Cell{iCells[i][j], &i, &j};
         }
     }
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            std::cout << *mCells[i][8]->getCoordinates()[0] << *mCells[8][i]->getCoordinates()[1] << " ";
+        }
+    }
+    std::cout << "hi";
     for (int i = 0; i < 9; i++)
     {
         possibleValues[i] = new int{i + 1};
     }
     randomizeValues();
-    std::cout << validBox(5) << std::endl;
-    std::cout << validRow(5) << std::endl;
-    std::cout << validColumn(5) << std::endl;
+    // std::cout << columnSafe(mCells[3][4], new int{1}) << std::endl;
+    // // std::cout << boxSafe(mCells[3][4], new int{2}) << std::endl;
+    // // std::cout << safeToPlace(mCells[4][4], new int{2}) << std::endl;
+    // std::cout << rowSafe(mCells[3][4], new int{2}) << std::endl;
+    // // std::cout << (boxSafe(mCells[3][4], new int{2}) || rowSafe(mCells[4][4], new int{2}) || columnSafe(mCells[4][4], new int{2}));
 }
 
 Sudoku::~Sudoku() {}
@@ -56,7 +66,7 @@ Cell * Sudoku::getFistEmptyCell()
     {
         for (int j = 0; j < 9; j++)
         {
-            if (mCells[i][j]->getValue() == 0)
+            if (*mCells[i][j]->getValue() == 0)
             {
                 return mCells[i][j];
             }
@@ -66,21 +76,47 @@ Cell * Sudoku::getFistEmptyCell()
     return emptyCell;
 }
 
-bool Sudoku::validBoard()
-{
-    return false;
-}
+// bool Sudoku::validBoard()
+// {
+// }
 
-bool Sudoku::validRow(int iRow)
+bool Sudoku::rowSafe(Cell * iCell, int * iValue)
 {
-    int * RowValues[9];
     for (int i = 0; i < 9; i++)
     {
-        RowValues[i] = new int{*mCells[iRow - 1][i]->getValue()};
-        for (int j = 0; j < i; j++)
+        std::cout << *mCells[4][i]->getCoordinates()[0] << *mCells[4][i]->getCoordinates()[1] << " ";
+        if (*iValue == *mCells[*iCell->getCoordinates()[0]][i]->getValue() &&
+            *iValue != 0)
         {
-            if (*RowValues[j] == *mCells[iRow - 1][i]->getValue() &&
-                *RowValues[j] != 0)
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Sudoku::columnSafe(Cell * iCell, int * iValue)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        std::cout << *mCells[i][4]->getCoordinates()[0] << *mCells[i][4]->getCoordinates()[1] << " ";
+        if (*iValue == *mCells[i][*iCell->getCoordinates()[1]]->getValue() &&
+            *iValue != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Sudoku::boxSafe(Cell * iCell, int * iValue)
+{
+    int BoxStart[2] = {(*iCell->getCoordinates()[0] % 3) * 3,(*iCell->getCoordinates()[1] % 3) * 3};
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            if (*iValue == *mCells[BoxStart[0] + i][BoxStart[1] + j]->getValue() &&
+                *iValue != 0)
             {
                 return false;
             }
@@ -89,45 +125,18 @@ bool Sudoku::validRow(int iRow)
     return true;
 }
 
-bool Sudoku::validColumn(int iColumn)
+bool Sudoku::safeToPlace(Cell * iCell, int * iValue)
 {
-    int * ColumnValues[9];
-    for (int i = 0; i < 9; i++)
-    {
-        ColumnValues[i] = new int{*mCells[i][iColumn - 1]->getValue()};
-        for (int j = 0; j < i; j++)
-        {
-            if (*ColumnValues[j] == *mCells[i][iColumn - 1]->getValue() &&
-                *ColumnValues[j] != 0)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool Sudoku::validBox(int iBox)
-{
-    int * BoxValues[9];
-    int BoxOffset = (iBox - 1) % 3 * 3;
-    for (int i = 0; i < 9; i++)
-    {
-        BoxValues[i] = new int{*mCells[int(std::floor(i / 3)) + BoxOffset][i % 3 + BoxOffset]->getValue()};
-        for (int j = 0; j < i; j++)
-        {
-            if (*BoxValues[j] == *mCells[int(std::floor(i / 3)) + BoxOffset][i % 3 + BoxOffset]->getValue() &&
-                *BoxValues[j] != 0)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
+    return (boxSafe(iCell, iValue) || rowSafe(iCell, iValue) || columnSafe(iCell, iValue));
 }
 
 void Sudoku::generateBoard()
 {
     randomizeValues();
-    getFistEmptyCell()->setValue(possibleValues[0]);
+    bool BuildingBoard;
+    while (BuildingBoard)
+    {
+        getFistEmptyCell()->setValue(possibleValues[0]);
+
+    }
 }

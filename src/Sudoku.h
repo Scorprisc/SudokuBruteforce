@@ -8,7 +8,7 @@
 class Sudoku {
     public:
     Sudoku();
-    Sudoku(int * iBoxes[9][9]);
+    Sudoku(int * iCells[9][9]);
     ~Sudoku();
 
     void solveBoard();
@@ -18,10 +18,10 @@ class Sudoku {
     void randomizeValues();
     Cell * getFistEmptyCell();
 
-    bool validBoard();
-    bool validRow(int iRow);
-    bool validColumn(int iColumn);
-    bool validBox(int iBox);
+    bool rowSafe(Cell * iCell, int * iValue);
+    bool columnSafe(Cell * iCell, int * iValue);
+    bool boxSafe(Cell * iCell, int * iValue);
+    bool safeToPlace(Cell * iCell, int * iValue);
 
     private:
 
