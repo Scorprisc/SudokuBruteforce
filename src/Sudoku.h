@@ -12,11 +12,16 @@ class Sudoku {
     ~Sudoku();
 
     void solveBoard();
-    void generateBoard();
+    void fillCell(Cell * iCell);
+    void generateBoard(Cell * iCell, int iValuePosition);
     void coutBoard();
 
     void randomizeValues();
     Cell * getFistEmptyCell();
+
+    Cell * incrementCell(Cell * iCell);
+    Cell * decrementCell(Cell * iCell);
+
 
     bool rowSafe(Cell * iCell, int * iValue);
     bool columnSafe(Cell * iCell, int * iValue);

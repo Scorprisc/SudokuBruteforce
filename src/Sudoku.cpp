@@ -12,42 +12,31 @@ Sudoku::Sudoku()
 }
 Sudoku::Sudoku(int * iCells[9][9]) 
 {
-    for (int i = 0; i < 9; i++)
+    for (int row = 0; row < 9; row++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int column = 0; column < 9; column++)
         {
-            mCells[i][j] = new Cell{iCells[i][j], &i, &j};
+            mCells[row][column] = new Cell{iCells[row][column], &row, &column};
         }
     }
-    for (int i = 0; i < 9; i++)
+    for (int i = 1; i <= 9; i++)
     {
-        for (int j = 0; j < 9; j++)
-        {
-            std::cout << *mCells[i][8]->getCoordinates()[0] << *mCells[8][i]->getCoordinates()[1] << " ";
-        }
-    }
-    std::cout << "hi";
-    for (int i = 0; i < 9; i++)
-    {
-        possibleValues[i] = new int{i + 1};
+        possibleValues[i] = new int{i};
     }
     randomizeValues();
-    // std::cout << columnSafe(mCells[3][4], new int{1}) << std::endl;
-    // // std::cout << boxSafe(mCells[3][4], new int{2}) << std::endl;
-    // // std::cout << safeToPlace(mCells[4][4], new int{2}) << std::endl;
-    // std::cout << rowSafe(mCells[3][4], new int{2}) << std::endl;
-    // // std::cout << (boxSafe(mCells[3][4], new int{2}) || rowSafe(mCells[4][4], new int{2}) || columnSafe(mCells[4][4], new int{2}));
+    generateBoard(mCells[0][0], 0);
+    coutBoard();
 }
 
 Sudoku::~Sudoku() {}
 
 void Sudoku::coutBoard()
 {
-    for (int i = 0; i < 9; i++)
+    for (int row = 0; row < 9; row++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int column = 0; column < 9; column++)
         {
-            mCells[i][j]->coutCellValue();
+            mCells[row][column]->coutCellValue();
         }
         std::cout << std::endl;
     }
@@ -62,13 +51,14 @@ void Sudoku::randomizeValues()
 
 Cell * Sudoku::getFistEmptyCell()
 {
-    for (int i = 0; i < 9; i++)
+    for (int row = 0; row < 9; row++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int column = 0; column < 9; column++)
         {
-            if (*mCells[i][j]->getValue() == 0)
+            if (*mCells[row][column]->getValue() == 0)
             {
-                return mCells[i][j];
+                std::cout << "XY=" << mCells[row][column]->getRow() << mCells[row][column]->getColumn();
+                return mCells[row][column];
             }
         }
     }
@@ -82,10 +72,9 @@ Cell * Sudoku::getFistEmptyCell()
 
 bool Sudoku::rowSafe(Cell * iCell, int * iValue)
 {
-    for (int i = 0; i < 9; i++)
+    for (int column = 0; column < 9; column++)
     {
-        std::cout << *mCells[4][i]->getCoordinates()[0] << *mCells[4][i]->getCoordinates()[1] << " ";
-        if (*iValue == *mCells[*iCell->getCoordinates()[0]][i]->getValue() &&
+        if (*iValue == *mCells[*iCell->getRow()][column]->getValue() &&
             *iValue != 0)
         {
             return false;
@@ -96,10 +85,9 @@ bool Sudoku::rowSafe(Cell * iCell, int * iValue)
 
 bool Sudoku::columnSafe(Cell * iCell, int * iValue)
 {
-    for (int i = 0; i < 9; i++)
+    for (int row = 0; row < 9; row++)
     {
-        std::cout << *mCells[i][4]->getCoordinates()[0] << *mCells[i][4]->getCoordinates()[1] << " ";
-        if (*iValue == *mCells[i][*iCell->getCoordinates()[1]]->getValue() &&
+        if (*iValue == *mCells[row][*iCell->getColumn()]->getValue() &&
             *iValue != 0)
         {
             return false;
@@ -110,12 +98,13 @@ bool Sudoku::columnSafe(Cell * iCell, int * iValue)
 
 bool Sudoku::boxSafe(Cell * iCell, int * iValue)
 {
-    int BoxStart[2] = {(*iCell->getCoordinates()[0] % 3) * 3,(*iCell->getCoordinates()[1] % 3) * 3};
-    for (int i = 0; i < 3; i++)
+    int BoxStartX = *iCell->getRow() - *iCell->getRow() % 3;
+    int BoxStartY = *iCell->getColumn() - *iCell->getColumn() % 3;
+    for (int row = 0; row < 3; row++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int column = 0; column < 3; column++)
         {
-            if (*iValue == *mCells[BoxStart[0] + i][BoxStart[1] + j]->getValue() &&
+            if (*iValue == *mCells[BoxStartX + row][BoxStartY + column]->getValue() &&
                 *iValue != 0)
             {
                 return false;
@@ -127,16 +116,66 @@ bool Sudoku::boxSafe(Cell * iCell, int * iValue)
 
 bool Sudoku::safeToPlace(Cell * iCell, int * iValue)
 {
-    return (boxSafe(iCell, iValue) || rowSafe(iCell, iValue) || columnSafe(iCell, iValue));
+    return (boxSafe(iCell, iValue) && rowSafe(iCell, iValue) && columnSafe(iCell, iValue));
 }
 
-void Sudoku::generateBoard()
+// void Sudoku::fillCell(Cell * iCell)
+// {
+//     for (int i = 0; i < 9; i++)
+//     {
+//         if (safeToPlace(iCell, possibleValues[i]))
+//         {
+//             std::cout << std::endl <<"success" << *possibleValues[i];
+//             iCell->setValue(possibleValues[i]);
+//             break;
+//         }
+//     }
+//     if (*iCell->getValue() == 0)
+//     {
+//         std::cout << "go back";
+//         int previousCellX = *iCell->getRow();
+//         int previousCellY = *iCell->getColumn();
+//         if (previousCellX == 0)
+//         {
+//             previousCellX = 9;
+//             previousCellY --;
+//         }
+//         previousCellX --;
+//         mCells[previousCellX][previousCellY]->setValue(0);
+//     }
+// }
+
+Cell * Sudoku::incrementCell(Cell * iCell)
+{
+    int outputCellRow = *iCell->getRow();
+    int outputCellColumn = *iCell->getColumn();
+    if (outputCellRow == 0)
+    {
+        outputCellRow = 7;
+        outputCellColumn++;
+    }
+    outputCellRow++;
+    return mCells[outputCellRow][outputCellColumn];
+}
+
+Cell * Sudoku::decrementCell(Cell * iCell)
+{
+    int outputCellRow = *iCell->getRow();
+    int outputCellColumn = *iCell->getColumn();
+    if (outputCellRow == 0)
+    {
+        outputCellRow = 9;
+        outputCellColumn--;
+    }
+    outputCellRow--;
+    return mCells[outputCellRow][outputCellColumn];
+}
+
+void Sudoku::generateBoard(Cell * iCell, int iValuePosition)
 {
     randomizeValues();
-    bool BuildingBoard;
-    while (BuildingBoard)
-    {
-        getFistEmptyCell()->setValue(possibleValues[0]);
-
-    }
+    Cell * currentCell = getFistEmptyCell();
+    int testingValuePosition = iValuePosition;
+    iValuePosition++;
+    generateBoard(currentCell, iValuePosition);
 }

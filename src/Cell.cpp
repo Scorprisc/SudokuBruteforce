@@ -1,8 +1,8 @@
 #include "Cell.h"
 
-Cell::Cell() {mValue = new int{0}; mCoordinates[0] = new int{9}; mCoordinates[1] = new int{9};}
+Cell::Cell() {mValue = 0; mRow = 0; mColumn = 0;}
 
-Cell::Cell(int * iValue, int * iXCoordinate, int * iYCoordinate)
+Cell::Cell(int * iValue, int * iRow, int * iColumn)
 {
     if (iValue != nullptr)
     {
@@ -12,8 +12,8 @@ Cell::Cell(int * iValue, int * iXCoordinate, int * iYCoordinate)
     {
         mValue = new int{0};
     }
-    mCoordinates[0] = iXCoordinate;
-    mCoordinates[1] = iYCoordinate;
+    mRow = iRow;
+    mColumn = iColumn;
 }
 
 Cell::~Cell() {}
@@ -33,7 +33,12 @@ void Cell::coutCellValue()
     std::cout << *mValue << ", ";
 }
 
-std::array<int*, 2> Cell::getCoordinates()
+int * Cell::getRow()
 {
-    return mCoordinates;
+    return mColumn;
+}
+
+int * Cell::getColumn()
+{
+    return mRow;
 }
