@@ -13,7 +13,7 @@ class Sudoku {
 
     void solveBoard();
     void fillCell(Cell * iCell);
-    void generateBoard(Cell * iCell, int iValuePosition);
+    void generateBoard(Cell * iCell, int iValuePosition, int iCurrentLoop);
     void coutBoard();
 
     void randomizeValues();

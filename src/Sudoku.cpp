@@ -16,7 +16,7 @@ Sudoku::Sudoku(int * iCells[9][9])
     {
         for (int column = 0; column < 9; column++)
         {
-            mCells[row][column] = new Cell{iCells[row][column], &row, &column};
+            mCells[row][column] = new Cell{iCells[row][column], row, column};
         }
     }
     for (int i = 1; i <= 9; i++)
@@ -24,7 +24,7 @@ Sudoku::Sudoku(int * iCells[9][9])
         possibleValues[i] = new int{i};
     }
     randomizeValues();
-    generateBoard(mCells[0][0], 0);
+    generateBoard(mCells[0][0], 0, 0);
     coutBoard();
 }
 
@@ -57,24 +57,21 @@ Cell * Sudoku::getFistEmptyCell()
         {
             if (*mCells[row][column]->getValue() == 0)
             {
-                std::cout << "XY=" << mCells[row][column]->getRow() << mCells[row][column]->getColumn();
+                // std::cout << "XY=" << mCells[row][column]->getRow() << ":" << mCells[row][column]->getColumn() << "|";
+                mCells[row][column]->coutCoordinates();
                 return mCells[row][column];
             }
         }
     }
-    Cell * emptyCell{0};
+    Cell * emptyCell = new Cell{0, 0, 0};
     return emptyCell;
 }
-
-// bool Sudoku::validBoard()
-// {
-// }
 
 bool Sudoku::rowSafe(Cell * iCell, int * iValue)
 {
     for (int column = 0; column < 9; column++)
     {
-        if (*iValue == *mCells[*iCell->getRow()][column]->getValue() &&
+        if (*iValue == *mCells[iCell->getRow()][column]->getValue() &&
             *iValue != 0)
         {
             return false;
@@ -87,7 +84,7 @@ bool Sudoku::columnSafe(Cell * iCell, int * iValue)
 {
     for (int row = 0; row < 9; row++)
     {
-        if (*iValue == *mCells[row][*iCell->getColumn()]->getValue() &&
+        if (*iValue == *mCells[row][iCell->getColumn()]->getValue() &&
             *iValue != 0)
         {
             return false;
@@ -98,8 +95,8 @@ bool Sudoku::columnSafe(Cell * iCell, int * iValue)
 
 bool Sudoku::boxSafe(Cell * iCell, int * iValue)
 {
-    int BoxStartX = *iCell->getRow() - *iCell->getRow() % 3;
-    int BoxStartY = *iCell->getColumn() - *iCell->getColumn() % 3;
+    int BoxStartX = iCell->getRow() - iCell->getRow() % 3;
+    int BoxStartY = iCell->getColumn() - iCell->getColumn() % 3;
     for (int row = 0; row < 3; row++)
     {
         for (int column = 0; column < 3; column++)
@@ -119,36 +116,10 @@ bool Sudoku::safeToPlace(Cell * iCell, int * iValue)
     return (boxSafe(iCell, iValue) && rowSafe(iCell, iValue) && columnSafe(iCell, iValue));
 }
 
-// void Sudoku::fillCell(Cell * iCell)
-// {
-//     for (int i = 0; i < 9; i++)
-//     {
-//         if (safeToPlace(iCell, possibleValues[i]))
-//         {
-//             std::cout << std::endl <<"success" << *possibleValues[i];
-//             iCell->setValue(possibleValues[i]);
-//             break;
-//         }
-//     }
-//     if (*iCell->getValue() == 0)
-//     {
-//         std::cout << "go back";
-//         int previousCellX = *iCell->getRow();
-//         int previousCellY = *iCell->getColumn();
-//         if (previousCellX == 0)
-//         {
-//             previousCellX = 9;
-//             previousCellY --;
-//         }
-//         previousCellX --;
-//         mCells[previousCellX][previousCellY]->setValue(0);
-//     }
-// }
-
 Cell * Sudoku::incrementCell(Cell * iCell)
 {
-    int outputCellRow = *iCell->getRow();
-    int outputCellColumn = *iCell->getColumn();
+    int outputCellRow = iCell->getRow();
+    int outputCellColumn = iCell->getColumn();
     if (outputCellRow == 0)
     {
         outputCellRow = 7;
@@ -160,8 +131,8 @@ Cell * Sudoku::incrementCell(Cell * iCell)
 
 Cell * Sudoku::decrementCell(Cell * iCell)
 {
-    int outputCellRow = *iCell->getRow();
-    int outputCellColumn = *iCell->getColumn();
+    int outputCellRow = iCell->getRow();
+    int outputCellColumn = iCell->getColumn();
     if (outputCellRow == 0)
     {
         outputCellRow = 9;
@@ -171,11 +142,24 @@ Cell * Sudoku::decrementCell(Cell * iCell)
     return mCells[outputCellRow][outputCellColumn];
 }
 
-void Sudoku::generateBoard(Cell * iCell, int iValuePosition)
+void Sudoku::generateBoard(Cell * iCell, int iValuePosition, int iCurrentLoop)
 {
-    randomizeValues();
-    Cell * currentCell = getFistEmptyCell();
-    int testingValuePosition = iValuePosition;
-    iValuePosition++;
-    generateBoard(currentCell, iValuePosition);
+    // int CurrentLoop = iCurrentLoop + 1;
+    // if (CurrentLoop < 1000)
+    // {
+    //     Cell * currentCell = getFistEmptyCell();
+    //     // std::cout << currentCell->getRow() << ":" << currentCell->getColumn() << "|";
+    //     int testingValuePosition = iValuePosition;
+    //     if (safeToPlace(currentCell, possibleValues[testingValuePosition]))
+    //     {
+    //         currentCell->setValue(possibleValues[0]);
+    //         randomizeValues();
+    //         generateBoard(incrementCell(currentCell), 0, CurrentLoop);
+    //     }
+    //     else if (testingValuePosition == 0)
+    //     {
+
+    //     }
+    //     testingValuePosition++;
+    // }
 }

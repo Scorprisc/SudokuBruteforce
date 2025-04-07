@@ -54,7 +54,5 @@ int main() {
     }
 
     Sudoku sudokuBoard{BoxValues};
-
-    // sudokuBoard.coutBoard();
     return 0;
 }

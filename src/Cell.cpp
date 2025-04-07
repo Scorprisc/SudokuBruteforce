@@ -2,7 +2,7 @@
 
 Cell::Cell() {mValue = 0; mRow = 0; mColumn = 0;}
 
-Cell::Cell(int * iValue, int * iRow, int * iColumn)
+Cell::Cell(int * iValue, int iRow, int iColumn)
 {
     if (iValue != nullptr)
     {
@@ -33,12 +33,17 @@ void Cell::coutCellValue()
     std::cout << *mValue << ", ";
 }
 
-int * Cell::getRow()
+int Cell::getRow()
 {
     return mColumn;
 }
 
-int * Cell::getColumn()
+int Cell::getColumn()
 {
     return mRow;
+}
+
+void Cell::coutCoordinates()
+{
+    std::cout << mRow << ":" << mColumn << "|";
 }

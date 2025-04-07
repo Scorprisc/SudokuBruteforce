@@ -1,6 +1,7 @@
 .vs/*
 .vscode/*
 out/*
+SudokuBruteforce_build/*
 build/*
 CMakeLists.txt
 
