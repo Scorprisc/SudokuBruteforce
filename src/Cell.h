@@ -1,5 +1,4 @@
 #include <iostream>
-#include <array>
 
 class Cell{
     public:
@@ -8,6 +7,7 @@ class Cell{
     ~Cell();
 
     void setValue(int * iValue);
+    void resetValue();
     int * getValue();
     int getRow();
     int getColumn();

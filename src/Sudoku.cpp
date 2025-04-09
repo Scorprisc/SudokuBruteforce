@@ -2,13 +2,16 @@
 
 Sudoku::Sudoku() 
 {
-    for (int i = 0; i < 9; i++)
+    for (int row = 0; row < 9; row++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int column = 0; column < 9; column++)
         {
-            mCells[i][j] = new Cell{0, 0, 0};
+            mCells[row][column] = new Cell{0, row, column};
         }
     }
+    randomizeValues();
+    generateBoard(mCells[0][0], 0, 0);
+    coutBoard();
 }
 Sudoku::Sudoku(int * iCells[9][9]) 
 {
@@ -21,10 +24,9 @@ Sudoku::Sudoku(int * iCells[9][9])
     }
     for (int i = 1; i <= 9; i++)
     {
-        possibleValues[i] = new int{i};
+        possibleValues[i - 1] = new int{i};
     }
-    randomizeValues();
-    generateBoard(mCells[0][0], 0, 0);
+    solveBoard(0, 0);
     coutBoard();
 }
 
@@ -34,11 +36,29 @@ void Sudoku::coutBoard()
 {
     for (int row = 0; row < 9; row++)
     {
-        for (int column = 0; column < 9; column++)
+        if (row % 3 == 0)
         {
-            mCells[row][column]->coutCellValue();
+            std::cout << std::endl;
+            for (int i = 0; i < 31; i++)
+            {
+                std::cout << "-";
+            }
         }
         std::cout << std::endl;
+        for (int column = 0; column < 9; column++)
+        {
+            if (column % 3 == 0)
+            {
+                std::cout << "|";
+            }
+            mCells[row][column]->coutCellValue();
+        } 
+        std::cout << "|";
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < 31; i++)
+    {
+        std::cout << "-";
     }
 }
 
@@ -57,8 +77,7 @@ Cell * Sudoku::getFistEmptyCell()
         {
             if (*mCells[row][column]->getValue() == 0)
             {
-                // std::cout << "XY=" << mCells[row][column]->getRow() << ":" << mCells[row][column]->getColumn() << "|";
-                mCells[row][column]->coutCoordinates();
+                // mCells[row][column]->coutCoordinates();
                 return mCells[row][column];
             }
         }
@@ -120,12 +139,12 @@ Cell * Sudoku::incrementCell(Cell * iCell)
 {
     int outputCellRow = iCell->getRow();
     int outputCellColumn = iCell->getColumn();
-    if (outputCellRow == 0)
+    if (outputCellColumn == 8)
     {
-        outputCellRow = 7;
-        outputCellColumn++;
+        outputCellColumn = -1;
+        outputCellRow++;
     }
-    outputCellRow++;
+    outputCellColumn++;
     return mCells[outputCellRow][outputCellColumn];
 }
 
@@ -133,33 +152,115 @@ Cell * Sudoku::decrementCell(Cell * iCell)
 {
     int outputCellRow = iCell->getRow();
     int outputCellColumn = iCell->getColumn();
-    if (outputCellRow == 0)
+    if (outputCellColumn == 0)
     {
-        outputCellRow = 9;
-        outputCellColumn--;
+        outputCellColumn = 9;
+        outputCellRow--;
     }
-    outputCellRow--;
+    outputCellColumn--;
     return mCells[outputCellRow][outputCellColumn];
 }
 
-void Sudoku::generateBoard(Cell * iCell, int iValuePosition, int iCurrentLoop)
+void Sudoku::solveBoard(int iValuePosition,int iCurrentLoop)
 {
-    // int CurrentLoop = iCurrentLoop + 1;
-    // if (CurrentLoop < 1000)
-    // {
-    //     Cell * currentCell = getFistEmptyCell();
-    //     // std::cout << currentCell->getRow() << ":" << currentCell->getColumn() << "|";
-    //     int testingValuePosition = iValuePosition;
-    //     if (safeToPlace(currentCell, possibleValues[testingValuePosition]))
-    //     {
-    //         currentCell->setValue(possibleValues[0]);
-    //         randomizeValues();
-    //         generateBoard(incrementCell(currentCell), 0, CurrentLoop);
-    //     }
-    //     else if (testingValuePosition == 0)
-    //     {
+    Cell * currentCell = getFistEmptyCell();
+    int testingValuePosition = iValuePosition;
+    int CurrentLoop = iCurrentLoop + 1;
+    // std::cout <<mChangedCells.size();
+    // std::cout << testingValuePosition << "=" <<*possibleValues[testingValuePosition]
+    // <<  " safe:"
+    // << safeToPlace(currentCell, possibleValues[testingValuePosition])
+    // << boxSafe(currentCell, possibleValues[testingValuePosition])
+    // << columnSafe(currentCell, possibleValues[testingValuePosition])
+    // << rowSafe(currentCell, possibleValues[testingValuePosition])
+    // << " | " ;
+    if (CurrentLoop < 25892)
+    {
+        if (CurrentLoop > 25880)
+        {
+            coutBoard();
+            currentCell->coutCoordinates();
+            std::cout << " value : " << *currentCell->getValue() << " tested value : " << *possibleValues[testingValuePosition] << " vector size : " << mChangedCells.size();
+        }
+        mChangedCells.emplace_back(currentCell);
+        if (safeToPlace(mChangedCells.back(), possibleValues[testingValuePosition]))
+        {
+            currentCell->setValue(possibleValues[testingValuePosition]);
+            // currentCell->coutCoordinates();
+            // std::cout << *currentCell->getValue() << "works" << ";" << std::endl;
+            solveBoard(0, CurrentLoop);
+        }
+        else if (*possibleValues[testingValuePosition] < 9)
+        {
+            // currentCell->coutCoordinates();
+            // std::cout << *possibleValues[testingValuePosition] << "retry" << ";" << std::endl;
+            mChangedCells.pop_back();
+            testingValuePosition++;
+            solveBoard(testingValuePosition, CurrentLoop);
+        }
+        else
+        {
+            mChangedCells.pop_back();
+            testingValuePosition = *mChangedCells.back()->getValue() ;
+            mChangedCells.back()->resetValue();
+            // currentCell->coutCoordinates();
+            // std::cout << "error" << *mChangedCells.back()->getValue() << ";" << std::endl;
+            // coutBoard();
+            // std::cout << "redo";
+            while (testingValuePosition == 9)
+            {
+                // coutBoard();
+                mChangedCells.pop_back();
+                testingValuePosition = *mChangedCells.back()->getValue() ;
+                // std::cout << mChangedCells.size() << testingValuePosition + 1;
+                mChangedCells.back()->resetValue();
+            }
+            mChangedCells.pop_back();
+            // std::cout << mChangedCells.size() << testingValuePosition + 1;
+            solveBoard(testingValuePosition, CurrentLoop);
+        }
+    }
+    else
+    {
+        currentCell->coutCoordinates();
+        std::cout << mChangedCells.size() << *mChangedCells.back()->getValue() << "end of loop";
+    }
+}
 
-    //     }
-    //     testingValuePosition++;
-    // }
+void Sudoku::generateBoard(Cell * iCell, int iValuePosition,int iCurrentLoop)
+{
+    int CurrentLoop = iCurrentLoop + 1;
+    if (CurrentLoop < 1000)
+    {
+        // Cell * currentCell = iCell;
+        iCell->coutCoordinates();
+        int testingValuePosition = iValuePosition;
+        // std::cout << testingValuePosition << "=" <<*possibleValues[testingValuePosition]
+        // <<  " safe:"
+        // << safeToPlace(iCell, possibleValues[testingValuePosition])
+        // << boxSafe(currentCell, possibleValues[testingValuePosition])
+        // << columnSafe(currentCell, possibleValues[testingValuePosition])
+        // << rowSafe(currentCell, possibleValues[testingValuePosition])
+        // << " | " << std::endl;
+        if (safeToPlace(iCell, possibleValues[testingValuePosition]))
+        {
+            iCell->setValue(possibleValues[testingValuePosition]);
+            // std::cout << "works" << *currentCell->getValue() << ";";
+            randomizeValues();
+            generateBoard(incrementCell(iCell), 0, CurrentLoop);
+        }
+        else if (testingValuePosition < 8)
+        {
+            // std::cout << "retry" << *possibleValues[testingValuePosition] << ";";
+            testingValuePosition++;
+            generateBoard(incrementCell(iCell), testingValuePosition, CurrentLoop);
+        }
+        else
+        {
+            // std::cout << "error";
+            decrementCell(iCell)->resetValue();
+            testingValuePosition++;
+            generateBoard(decrementCell(iCell), 0, CurrentLoop);
+        }
+    }
 }

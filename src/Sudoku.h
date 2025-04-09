@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <random>
 #include <cmath>
+#include <vector>
 
 #include "Cell.h"
 
@@ -11,8 +12,7 @@ class Sudoku {
     Sudoku(int * iCells[9][9]);
     ~Sudoku();
 
-    void solveBoard();
-    void fillCell(Cell * iCell);
+    void solveBoard(int iValuePosition,int iCurrentLoop);
     void generateBoard(Cell * iCell, int iValuePosition, int iCurrentLoop);
     void coutBoard();
 
@@ -31,6 +31,8 @@ class Sudoku {
     private:
 
     Cell * mCells[9][9];
+
+    std::vector<Cell *> mChangedCells;
 
     int * possibleValues[9];
 };

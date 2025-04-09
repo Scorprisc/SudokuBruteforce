@@ -23,6 +23,11 @@ void Cell::setValue(int * iValue)
     mValue = iValue;
 }
 
+void Cell::resetValue()
+{
+    mValue = new int{0};
+}
+
 int* Cell::getValue()
 {
     return mValue;
@@ -30,20 +35,20 @@ int* Cell::getValue()
 
 void Cell::coutCellValue()
 {
-    std::cout << *mValue << ", ";
+    std::cout << " " << *mValue << " ";
 }
 
 int Cell::getRow()
 {
-    return mColumn;
+    return mRow;
 }
 
 int Cell::getColumn()
 {
-    return mRow;
+    return mColumn;
 }
 
 void Cell::coutCoordinates()
 {
-    std::cout << mRow << ":" << mColumn << "|";
+    std::cout << mRow << ":" << mColumn << "=>";
 }
